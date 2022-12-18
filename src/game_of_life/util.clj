@@ -14,25 +14,29 @@
    :y y
    :alive? false})
 
-;; TODO: probably a smarter way to do this not at 3:59am
+(defn find-first
+  [f coll]
+  (reduce #(when (f %2) (reduced %2)) nil coll))
+
+;; TODO: probably a smarter concurrent way to do this not at 3:59am
 (defn get-neighbors
   [cell cells]
   (let [x (:x cell)
         y (:y cell)
-        up (or (first (filter #(and (= x (:x %)) (= (inc y) (:y %))) cells)) 
+        up (or (find-first #(and (= x (:x %)) (= (inc y) (:y %))) cells) 
                (create-dead-cell x (inc y)))
-        down (or (first (filter #(and (= x (:x %)) (= (dec y) (:y %))) cells))
+        down (or (find-first #(and (= x (:x %)) (= (dec y) (:y %))) cells)
                  (create-dead-cell x (dec y)))
-        right (or (first (filter #(and (= (inc x) (:x %)) (= y (:y %))) cells))
+        right (or (find-first #(and (= (inc x) (:x %)) (= y (:y %))) cells)
                   (create-dead-cell (inc x) y))
-        left (or (first (filter #(and (= (dec x) (:x %)) (= y (:y %))) cells))
+        left (or (find-first #(and (= (dec x) (:x %)) (= y (:y %))) cells)
                  (create-dead-cell (dec x) y))
-        ur (or (first (filter #(and (= (inc x) (:x %)) (= (inc y) (:y %))) cells))
+        ur (or (find-first #(and (= (inc x) (:x %)) (= (inc y) (:y %))) cells)
                (create-dead-cell (inc x) (inc y)))
-        ul (or (first (filter #(and (= (dec x) (:x %)) (= (inc y) (:y %))) cells))
+        ul (or (find-first #(and (= (dec x) (:x %)) (= (inc y) (:y %))) cells)
                (create-dead-cell (dec x) (inc y)))
-        lr (or (first (filter #(and (= (inc x) (:x %)) (= (dec y) (:y %))) cells))
+        lr (or (find-first #(and (= (inc x) (:x %)) (= (dec y) (:y %))) cells)
                (create-dead-cell (inc x) (dec y)))
-        ll (or (first (filter #(and (= (dec x) (:x %)) (= (dec y) (:y %))) cells))
+        ll (or (find-first #(and (= (dec x) (:x %)) (= (dec y) (:y %))) cells)
                (create-dead-cell (dec x) (dec y)))]
     [up down right left ur ul lr ll]))

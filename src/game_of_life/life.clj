@@ -2,13 +2,17 @@
   (:require [game-of-life.rules :as rules]
             [game-of-life.util :as util]))
 
+(defn- grow
+  [cells]
+  (let [cells-alive (filter :alive? cells)
+        cells-alive-neighbors (flatten (pmap #(util/get-neighbors % cells) cells-alive))]
+    (distinct (into cells cells-alive-neighbors))))
+
 (defn tick
   [world]
-  (let [cells (:cells world)
-        time  (:time world)
-        new-cells (map #(if (or (rules/survives? % cells) 
-                                (rules/regenerates? % cells))
+  (let [cells (grow (:cells world))
+        new-cells (pmap #(if (rules/is-alive? % cells)
                           (util/create-live-cell (:x %) (:y %))
                           (util/create-dead-cell (:x %) (:y %))) cells)
-        new-time (inc time)]
+        new-time (inc (:time world))]
   {:cells new-cells :time new-time}))
